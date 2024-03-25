@@ -15,7 +15,7 @@ public class ObjectSendToQueue {
 
 	private static final String url = ActiveMQConnection.DEFAULT_BROKER_URL;
 
-	private static final String queueName = "OBJECT_QUEUE";  
+	private static final String queueName = "OBJECT_QUEUE";
 
 	public static void sendingTOQueue() throws JMSException {
 
@@ -23,61 +23,29 @@ public class ObjectSendToQueue {
 
 		ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(url);
 
-		// activeMQConnectionFactory.setTrustedPackages(Arrays.asList("demo"));
+		try {
+			Connection connection = activeMQConnectionFactory.createConnection();
+			connection.start();
 
-		try{
+			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-		Connection connection = activeMQConnectionFactory.createConnection();
-		connection.start();
+			Destination destination = session.createQueue(queueName);
 
-		Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			MessageProducer producer = session.createProducer(destination);
 
-		Destination destination = session.createQueue(queueName);
+			TextMessage message = session.createTextMessage(employee.toString());
 
-		MessageProducer producer = session.createProducer(destination);
+			producer.send(message);
 
-		// ObjectMessage objectMessage = session.createObjectMessage(employee);
-        
-		// jmsTemplate.convertAndSend(jmsDestinjava.lang.Throwable: Delivery[7] exceeds redelivery policy limit:RedeliveryPolicy {destination = null, collisionAvoidanceFactor = 0.15, maximumRedeliveries = 6, maximumRedeliveryDelay = -1, initialRedeliveryDelay = 1000, useCollisionAvoidance = false, useExponentialBackOff = false, backOffMultiplier = 5.0, redeliveryDelay = 1000, preDispatchCheck = true}, cause:null"ation,customer.toString());
-		TextMessage message=session.createTextMessage(employee.toString());
+			producer.send(destination, message, DeliveryMode.NON_PERSISTENT, 1, 300l);
 
-		producer.send(message);
-		producer.send(destination,message,DeliveryMode.NON_PERSISTENT,1,300l);
-		// producer.send(objectMessage);
-		System.out.println("printing after sending message'");
-		producer.close();
-		session.close();
-		connection.close();
-		}
-		catch(JMSException e)
-		{
-           e.printStackTrace();
+			System.out.println("printing after sending message'");
+
+			producer.close();
+			session.close();
+			connection.close();
+		} catch (JMSException e) {
+			e.printStackTrace();
 		}
 	}
 }
-
-/*
- * 
- * // The name of the queue.
- * this.queueName = queueName;
- * // URL of the JMS server is required to create connection factory.
- * // DEFAULT_BROKER_URL is : tcp://localhost:61616 and is indicates that JMS
- * // server is running on localhost
- * connectionFactory = new ActiveMQConnectionFactory(DEFAULT_BROKER_URL);
- * // Getting JMS connection from the server and starting it
- * connection = connectionFactory.createConnection();
- * connection.setClientID(CLIENTID);
- * connection.start();
- * // Creating a non-transactional session to send/receive JMS message.
- * session = connection.createSession(false, AUTO_ACKNOWLEDGE);
- * // Destination represents here our queue ’MyFirstActiveMQ’ on the JMS
- * // server.
- * // The queue will be created automatically on the JSM server if its not
- * already
- * // created.
- * destination = session.createQueue(this.queueName);
- * // MessageProducer is used for sending (producing) messages to the queue.
- * producer = session.createProducer(destination);
- * // MessageConsumer is used for receiving (consuming) messages from the queue.
- * consumer = session.createConsumer(destination);
- */

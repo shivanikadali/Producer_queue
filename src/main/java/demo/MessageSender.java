@@ -12,51 +12,51 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 
 public class MessageSender {
 
-    // URL of the JMS server. DEFAULT_BROKER_URL will just mean that JMS server is
-    // on localhost
+    // URL of the JMS server. DEFAULT_BROKER_URL will just mean that JMS server is on localhost
     // default broker URL is : tcp://localhost:61616"
+    private static final String url = ActiveMQConnection.DEFAULT_BROKER_URL;
 
-    private static final String url = ActiveMQConnection.DEFAULT_BROKER_URL;  
-
-    // Queue Name.You can create any/many queue names as per your requirement.
-
+    // Queue Name : You can create any/many queue names as per your requirement.
     private static final String queueName = "MESSAGE_QUEUE";
 
-    //throws a JMSException(checked exception), that can occur during JMS operations
+    // throws a JMSException(checked exception), that can occur during JMS
+    // operations
     public static void sendingTOQueue() throws JMSException {
 
         // Getting JMS connection from the JMS server and starting it
-
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(url);
         Connection connection = activeMQConnectionFactory.createConnection();
         connection.start();
 
         // Creating a non transactional session to send/receive JMS message.
-
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
         // The queue will be created automatically on the server.
-
         Destination destination = session.createQueue(queueName);
 
         // Destination represents here our queue 'MESSAGE_QUEUE' on the JMS server.
-        // MessageProducewr is used for sending messages to the queue.
+        // MessageProducer is used for sending messages to the queue.
 
         MessageProducer producer = session.createProducer(destination);
-        
-        TextMessage greetingMessage = session.createTextMessage("hiiii");
 
-        greetingMessage.setStringProperty("Type","greetings");
-        // Here we are sending our message!
-        producer.send(destination,greetingMessage,1,1,20000l);
+        TextMessage greetingMessage = session.createTextMessage("Hiiii developer");
 
-        //we will send a small text with small json
+        greetingMessage.setStringProperty("Type", "greetings");
+
+        // Here we are sending our message
+        producer.send(destination, greetingMessage, 1, 1, 20000l);
+
+        // 2nd message to the same queue
         TextMessage message = session.createTextMessage("develop an application");
-        // message.setIntProperty("property",1);
-        message.setStringProperty("Type","information");
-        producer.send(destination,message,2,2,20000l);
+
+        message.setStringProperty("Type", "information");
+
+        producer.send(destination, message, 2, 2, 20000l);
 
         System.out.println("sent the msgs successfully");
+         
+        producer.close();
+        session.close();
         connection.close();
     }
 }
