@@ -1,6 +1,9 @@
 package demo;
 
+// http://127.0.0.1:8161/admin/queues.jsp admin page
+
 import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
@@ -24,8 +27,8 @@ public class MessageSender {
     public static void sendingTOQueue() throws JMSException {
 
         // Getting JMS connection from the JMS server and starting it
-        ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(url);
-        Connection connection = activeMQConnectionFactory.createConnection();
+        ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
+        Connection connection = connectionFactory.createConnection();
         connection.start();
 
         // Creating a non transactional session to send/receive JMS message.
@@ -44,6 +47,7 @@ public class MessageSender {
         greetingMessage.setStringProperty("Type", "greetings");
 
         // Here we are sending our message
+        //QOS
         producer.send(destination, greetingMessage, 1, 1, 20000l);
 
         // 2nd message to the same queue
